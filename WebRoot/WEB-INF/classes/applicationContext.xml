@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+				http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+           
+  <context:component-scan base-package="there.is.a.way"></context:component-scan>
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+	    	<list>
+	    		<value>classpath:jdbc.properties</value>
+	    	</list>
+		</property>
+	</bean>
+  <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!-- 定义数据源的信息 -->  
+     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"  
+        destroy-method="close">  
+        <property name="driverClass" value="${driverClass}" />          
+        <property name="jdbcUrl" value="${jdbcUrl}" />         
+        <property name="user" value="${user}" />        
+        <property name="password" value="${password}" />        
+        <property name="maxPoolSize">  
+            <value>80</value>  
+        </property>  
+        <property name="minPoolSize">  
+            <value>1</value>  
+        </property>  
+        <property name="initialPoolSize">  
+            <value>1</value>  
+        </property>  
+        <property name="maxIdleTime">  
+            <value>20</value>  
+        </property>  
+    </bean> 
+  
+    <!--定义Hibernate的SessionFactory -->  
+    <!-- SessionFactory使用的数据源为上面的数据源 -->  
+    <!-- 指定了Hibernate的映射文件和配置信息 -->  
+    <bean id="sessionFactory"  
+        class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">  
+        <property name="dataSource" ref="dataSource" />               
+        <property name="configLocation" value="classpath:hibernate.cfg.xml" /> 
+    </bean>  
+  
+    <bean id="transactionManager"  
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager">  
+        <property name="sessionFactory" ref="sessionFactory" />  
+    </bean> 
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+    
+    <!-- more bean definitions go here -->  
+  	
+</beans>  
